@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Global Trade Wars Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- D3.js -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/d3-simple-slider"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="dashboard">
+    <header>
+      <h1>Global Trade Wars Dashboard</h1>
+      <p class="subtitle">Comparative Analysis 2018-2024</p>
+    </header>
+
+    <!-- Case Study Selector -->
+    <div class="controls">
+      <label for="case-study">Case Study:</label>
+      <select id="case-study">
+        <option value="us-china">U.S.-China Trade War</option>
+        <option value="brexit">Brexit Impact</option>
+        <option value="us-eu">U.S.-EU Steel Dispute</option>
+      </select>
+    </div>
+
+    <!-- Visualization Grid -->
+    <div class="grid-container">
+      <!-- Map -->
+      <div class="card" id="map-card">
+        <h2><span class="icon">🌍</span> Tariff Heatmap</h2>
+        <div id="map"></div>
+      </div>
+      
+      <!-- Timeline -->
+      <div class="card" id="timeline-card">
+        <h2><span class="icon">📅</span> Timeline Control</h2>
+        <div id="timeline"></div>
+      </div>
+      
+      <!-- Trade Chart -->
+      <div class="card" id="trade-card">
+        <h2><span class="icon">📊</span> Trade Volumes</h2>
+        <div id="trade-chart"></div>
+      </div>
+      
+      <!-- Macro Table -->
+      <div class="card" id="macro-card">
+        <h2><span class="icon">💹</span> Macroeconomic Indicators</h2>
+        <div id="macro-table"></div>
+      </div>
+    </div>
+    
+    <footer>
+      <p>Data sources: USITC, World Bank WITS, IMF, Eurostat | Updated: May 2024</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
