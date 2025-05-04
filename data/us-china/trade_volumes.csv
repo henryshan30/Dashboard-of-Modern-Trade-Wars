@@ -1,0 +1,15 @@
+year,exporter,importer,product,value_usd_billion
+2018,US,CN,Soybeans,12.3
+2018,CN,US,Electronics,45.2
+2019,US,CN,Soybeans,3.1
+2019,CN,US,Chemicals,18.7
+2020,US,CN,Medical Supplies,8.9
+2020,CN,US,Pharmaceuticals,12.4
+2021,US,CN,Semiconductors,9.8
+2021,CN,US,Rare Earth Metals,3.5
+2022,US,CN,Oil,15.7
+2022,CN,US,Consumer Electronics,32.4
+2023,US,CN,Aircraft,10.2
+2023,CN,US,Electric Vehicles,28.1
+2024,US,CN,Agricultural Products,7.8
+2024,CN,US,Solar Panels,14.3
