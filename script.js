@@ -10,7 +10,7 @@ const config = {
     },
     defaultRadius: 8
   };
-   
+  
   // Fix Leaflet icons
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -376,6 +376,11 @@ const config = {
   }
   
   function renderCommodityTable(data) {
+    if (data.length === 0) {
+      d3.select("#commodity-table").html("<div class='loader'>No data matching filters</div>");
+      return;
+    }
+  
     // Create a comprehensive lookup map
     const tradeMap = new Map();
     currentData.trade.forEach(d => {
@@ -411,6 +416,9 @@ const config = {
       };
     });
   
+    // Sort data (existing sort logic remains the same)
+    processedData.sort((a, b) => a.year - b.year);
+  
     // Create table
     const table = d3.select("#commodity-table")
       .html("")
@@ -420,7 +428,7 @@ const config = {
     // Header
     table.append("thead").append("tr")
       .selectAll("th")
-      .data(["Year", "Country", "Partner", "Product", "Value (B)", "YoY Change"])
+      .data(["Year", "Country", "Partner", "Product", "Value (USD Billion)", "YoY Change"])
       .enter()
       .append("th")
       .text(d => d);
@@ -437,26 +445,28 @@ const config = {
     rows.append("td").text(d => d.country);
     rows.append("td").text(d => d.partner);
     rows.append("td").text(d => d.product);
-    rows.append("td").text(d => d3.format(",.1f")(d.value));
+    rows.append("td").text(d => d3.format(",.2f")(d.value));
   
-    // YoY Change cell
+    // YoY Change cell with color coding and original "No previous data" text
     rows.append("td")
       .attr("class", d => {
-        if (d.year === 2018) return "baseline";
-        if (!d.hasChange) return "no-data";
-        return d.change >= 0 ? "positive" : "negative";
+        if (d.year === 2018) return "baseline-change";
+        if (!d.hasChange) return "no-change";
+        return d.change >= 0 ? "positive-change" : "negative-change";
       })
       .html(d => {
         if (d.year === 2018) return "Baseline";
-        if (!d.hasChange) return "No prev. data";
-        const arrow = d.change >= 0 ? "↑" : "↓";
+        if (!d.hasChange) return "No previous data"; // Kept original text
+        const arrow = d.change >= 0 ? 
+          '<span class="change-arrow" style="color:#27ae60">↑</span>' : 
+          '<span class="change-arrow" style="color:#e74c3c">↓</span>';
         return `${arrow} ${d3.format("+.1f")(d.change)}%`;
       })
       .append("title")
       .text(d => {
         if (d.year === 2018) return "First year of data";
-        if (!d.hasChange) return `No ${d.product} trade between ${d.country} and ${d.partner} in ${d.year-1}`;
-        return `${d.year-1}: $${d3.format(",.1f")(d.prevValue)}B → ${d.year}: $${d3.format(",.1f")(d.value)}B`;
+        if (!d.hasChange) return `No ${d.product} trade data between ${d.country} and ${d.partner} in ${d.year-1}`;
+        return `${d.year-1}: $${d3.format(",.1f")(d.prevValue)}B → ${d.year}: $${d3.format(",.1f")(d.value)}B (${d.change > 0 ? '+' : ''}${d3.format(".1f")(d.change)}%)`;
       });
   }
   
