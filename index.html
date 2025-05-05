@@ -10,6 +10,8 @@
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://unpkg.com/d3-simple-slider"></script>
+  <!-- Lodash for debouncing -->
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
@@ -55,10 +57,42 @@
         <h2><span class="icon">💹</span> Macroeconomic Indicators</h2>
         <div id="macro-table"></div>
       </div>
+
+      <!-- Commodity Trade Explorer -->
+      <div class="card" id="commodity-card">
+        <h2><span class="icon">🔍</span> Commodity Trade Explorer</h2>
+        <div class="controls">
+          <label for="country-filter">Country:</label>
+          <select id="country-filter">
+            <option value="All Countries">All Countries</option>
+          </select>
+          <label for="year-filter">Year:</label>
+          <select id="year-filter">
+            <option value="All Years">All Years</option>
+          </select>
+        </div>
+        <div id="commodity-table">
+          <div class="loader">Select filters to view data</div>
+        </div>
+      </div>
+
+      <!-- Trade Volume Trends -->
+      <div class="card" id="trends-card">
+        <h2><span class="icon">📈</span> Trade Volume Trends</h2>
+        <div class="controls">
+          <label for="trend-country">Country:</label>
+          <select id="trend-country"></select>
+          <label for="trend-product">Product:</label>
+          <select id="trend-product"></select>
+        </div>
+        <div id="trend-chart">
+          <div class="trend-prompt">Select a country and product to view trends</div>
+        </div>
+      </div>
     </div>
     
     <footer>
-      <p>Data sources: USITC, World Bank WITS, IMF, Eurostat | Updated: May 2024</p>
+      <p>Data sources: USITC, World Bank WITS, IMF, Eurostat | Updated: May 2025</p>
     </footer>
   </div>
 
