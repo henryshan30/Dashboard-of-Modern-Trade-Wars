@@ -1,15 +1,43 @@
 year,exporter,importer,product,value_usd_billion
 2018,UK,EU,Financial Services,45.2
+2018,UK,EU,Automobiles,12.8
+2018,UK,EU,Pharmaceuticals,8.4
 2018,EU,UK,Automobiles,38.7
+2018,EU,UK,Chemicals,14.2
+2018,EU,UK,Food,22.5
+2019,UK,EU,Financial Services,32.6
 2019,UK,EU,Pharmaceuticals,12.1
+2019,UK,EU,Automobiles,9.3
 2019,EU,UK,Chemicals,15.3
+2019,EU,UK,Automobiles,34.1
+2019,EU,UK,Machinery,12.7
+2020,UK,EU,Financial Services,28.4
 2020,UK,EU,Fish,1.8
+2020,UK,EU,Pharmaceuticals,10.9
 2020,EU,UK,Food,10.4
+2020,EU,UK,Chemicals,13.8
+2020,EU,UK,Automobiles,22.7
+2021,UK,EU,Financial Services,25.3
 2021,UK,EU,Automobiles,5.6
+2021,UK,EU,Pharmaceuticals,9.7
 2021,EU,UK,Machinery,18.9
+2021,EU,UK,Chemicals,16.2
+2021,EU,UK,Automobiles,28.4
+2022,UK,EU,Financial Services,27.1
 2022,UK,EU,Steel,2.3
+2022,UK,EU,Pharmaceuticals,11.5
 2022,EU,UK,Textiles,7.5
+2022,EU,UK,Chemicals,17.8
+2022,EU,UK,Automobiles,31.2
+2023,UK,EU,Financial Services,29.8
 2023,UK,EU,Dairy,0.9
+2023,UK,EU,Pharmaceuticals,12.3
 2023,EU,UK,Electronics,22.1
+2023,EU,UK,Chemicals,19.4
+2023,EU,UK,Automobiles,33.7
 2024,UK,EU,Financial Services,30.5
+2024,UK,EU,Pharmaceuticals,13.1
+2024,UK,EU,Automobiles,7.4
 2024,EU,UK,Pharmaceuticals,14.8
+2024,EU,UK,Chemicals,18.6
+2024,EU,UK,Automobiles,35.2
