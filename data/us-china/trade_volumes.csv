@@ -1,15 +1,43 @@
 year,exporter,importer,product,value_usd_billion
 2018,US,CN,Soybeans,12.3
+2018,US,CN,Aircraft,16.2
+2018,US,CN,Oil,8.7
 2018,CN,US,Electronics,45.2
+2018,CN,US,Chemicals,9.8
+2018,CN,US,Textiles,22.1
 2019,US,CN,Soybeans,3.1
+2019,US,CN,Aircraft,12.8
+2019,US,CN,Oil,6.5
+2019,CN,US,Electronics,38.6
 2019,CN,US,Chemicals,18.7
+2019,CN,US,Textiles,19.4
 2020,US,CN,Medical Supplies,8.9
+2020,US,CN,Aircraft,5.3
+2020,US,CN,Oil,4.2
 2020,CN,US,Pharmaceuticals,12.4
+2020,CN,US,Electronics,42.8
+2020,CN,US,Textiles,15.7
 2021,US,CN,Semiconductors,9.8
+2021,US,CN,Aircraft,7.6
+2021,US,CN,Oil,9.3
 2021,CN,US,Rare Earth Metals,3.5
+2021,CN,US,Electronics,47.2
+2021,CN,US,Textiles,18.9
 2022,US,CN,Oil,15.7
+2022,US,CN,Aircraft,9.1
+2022,US,CN,Semiconductors,11.4
 2022,CN,US,Consumer Electronics,32.4
+2022,CN,US,Chemicals,14.8
+2022,CN,US,Textiles,21.6
 2023,US,CN,Aircraft,10.2
+2023,US,CN,Oil,12.9
+2023,US,CN,Agricultural Products,6.5
 2023,CN,US,Electric Vehicles,28.1
+2023,CN,US,Electronics,51.3
+2023,CN,US,Textiles,19.8
 2024,US,CN,Agricultural Products,7.8
+2024,US,CN,Aircraft,11.7
+2024,US,CN,Oil,14.2
 2024,CN,US,Solar Panels,14.3
+2024,CN,US,Electronics,49.6
+2024,CN,US,Textiles,17.4
