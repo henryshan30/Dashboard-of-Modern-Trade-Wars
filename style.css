@@ -144,6 +144,21 @@ tr:hover {
   font-weight: 500;
 }
 
+.baseline-change {
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.no-change {
+  color: #95a5a6;
+  font-style: italic;
+}
+
+/* Arrow styling for changes */
+.change-arrow {
+  margin-right: 3px;
+}
+
 /* Chart Containers */
 #trade-chart, #trend-chart {
   height: 400px;
@@ -175,6 +190,83 @@ tr:hover {
   fill: #e74c3c;
 }
 
+/* Insights Button */
+.insights-button {
+  padding: 8px 16px;
+  background-color: var(--secondary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.insights-button:hover {
+  background-color: #2980b9;
+}
+
+/* Insights Modal */
+.insights-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.insights-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 25px;
+  border-radius: 8px;
+  width: 60%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.close-insights {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.close-insights:hover {
+  color: var(--accent);
+}
+
+.insight-item {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.insight-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.insight-quote {
+  font-style: italic;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.insight-source {
+  font-size: 0.9em;
+  color: #7f8c8d;
+  text-align: right;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .grid-container {
@@ -201,6 +293,11 @@ tr:hover {
   #trade-chart, #trend-chart {
     height: 300px;
   }
+
+  .insights-content {
+    width: 90%;
+    margin: 20% auto;
+  }
 }
 
 /* Focus Styles */
@@ -213,28 +310,4 @@ tr:hover {
   .card {
     transition: none;
   }
-}
-.positive-change {
-  color: #27ae60;  /* Green */
-  font-weight: 500;
-}
-
-.negative-change {
-  color: #e74c3c;  /* Red */
-  font-weight: 500;
-}
-
-.baseline-change {
-  color: #7f8c8d;  /* Gray for baseline year */
-  font-style: italic;
-}
-
-.no-change {
-  color: #95a5a6;  /* Light gray for N/A */
-  font-style: italic;
-}
-
-/* Arrow styling for changes */
-.change-arrow {
-  margin-right: 3px;
 }
