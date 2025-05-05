@@ -30,6 +30,7 @@
         <option value="brexit">Brexit Impact</option>
         <option value="us-eu">U.S.-EU Steel Dispute</option>
       </select>
+      <button id="insights-button" class="insights-button">Show Insights</button>
     </div>
 
     <!-- Visualization Grid -->
@@ -94,6 +95,15 @@
     <footer>
       <p>Data sources: USITC, World Bank WITS, IMF, Eurostat | Updated: May 2025</p>
     </footer>
+  </div>
+
+  <!-- Insights Modal -->
+  <div id="insights-modal" class="insights-modal">
+    <div class="insights-content">
+      <span class="close-insights">&times;</span>
+      <h2 id="insights-title">Case Study Insights</h2>
+      <div id="insights-container"></div>
+    </div>
   </div>
 
   <script src="script.js"></script>
