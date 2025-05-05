@@ -44,7 +44,6 @@ year,exporter,importer,product,value_usd_billion
 2021,CN,US,Electronics,47.2
 2021,CN,US,Chemicals,19.3
 2021,CN,US,Textiles,18.9
-2021,CN,US,Rare Earth Metals,3.5
 2021,CN,US,Steel,14.5
 2021,CN,US,Machinery,17.6
 2022,US,CN,Soybeans,8.1
@@ -56,19 +55,16 @@ year,exporter,importer,product,value_usd_billion
 2022,CN,US,Electronics,32.4
 2022,CN,US,Chemicals,14.8
 2022,CN,US,Textiles,21.6
-2022,CN,US,Consumer Electronics,28.3
 2022,CN,US,Steel,13.8
 2022,CN,US,Machinery,19.2
 2023,US,CN,Soybeans,9.3
 2023,US,CN,Aircraft,10.2
 2023,US,CN,Oil,12.9
 2023,US,CN,Semiconductors,13.7
-2023,US,CN,Agricultural Products,6.5
 2023,US,CN,Automobiles,4.1
 2023,CN,US,Electronics,51.3
 2023,CN,US,Chemicals,17.9
 2023,CN,US,Textiles,19.8
-2023,CN,US,Electric Vehicles,28.1
 2023,CN,US,Steel,12.5
 2023,CN,US,Machinery,20.4
 2024,US,CN,Soybeans,10.5
@@ -80,6 +76,5 @@ year,exporter,importer,product,value_usd_billion
 2024,CN,US,Electronics,49.6
 2024,CN,US,Chemicals,18.4
 2024,CN,US,Textiles,17.4
-2024,CN,US,Solar Panels,14.3
 2024,CN,US,Steel,11.9
 2024,CN,US,Machinery,21.7
