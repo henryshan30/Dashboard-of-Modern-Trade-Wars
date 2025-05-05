@@ -214,3 +214,27 @@ tr:hover {
     transition: none;
   }
 }
+.positive-change {
+  color: #27ae60;  /* Green */
+  font-weight: 500;
+}
+
+.negative-change {
+  color: #e74c3c;  /* Red */
+  font-weight: 500;
+}
+
+.baseline-change {
+  color: #7f8c8d;  /* Gray for baseline year */
+  font-style: italic;
+}
+
+.no-change {
+  color: #95a5a6;  /* Light gray for N/A */
+  font-style: italic;
+}
+
+/* Arrow styling for changes */
+.change-arrow {
+  margin-right: 3px;
+}
