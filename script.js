@@ -10,7 +10,7 @@ const config = {
     },
     defaultRadius: 8
   };
-  
+   
   // Fix Leaflet icons
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
