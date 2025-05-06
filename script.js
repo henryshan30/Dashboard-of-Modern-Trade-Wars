@@ -686,39 +686,55 @@ function renderTrendChart(data, country, product) {
     .style("fill", "#777")
     .text(`From ${country}'s perspective`);
 
-  // Add tariff markers if available
-  const conflictYears = currentData.tariffs
-    .filter(d => d.country === country && d.tariff_rate > 0)
-    .map(d => d.year);
+  // Add tariff markers if available - UPDATED FOR MULTIPLE YEARS
+  const conflictData = currentData.tariffs
+    .filter(d => d.country === country && d.product === product && d.tariff_rate > 0)
+    .map(d => ({
+      year: d.year,
+      rate: d.tariff_rate
+    }));
 
-  if (conflictYears.length > 0) {
-    const uniqueConflictYears = [...new Set(conflictYears)];
-    
+  if (conflictData.length > 0) {
+    // Add vertical lines for each tariff year
     svg.selectAll(".conflict-marker")
-      .data(uniqueConflictYears)
+      .data(conflictData)
       .enter()
       .append("line")
       .attr("class", "conflict-marker")
-      .attr("x1", d => x(d))
-      .attr("x2", d => x(d))
+      .attr("x1", d => x(d.year))
+      .attr("x2", d => x(d.year))
       .attr("y1", 0)
       .attr("y2", height)
       .attr("stroke", "#f39c12")
-      .attr("stroke-width", 1)
-      .attr("stroke-dasharray", "5,5");
-    
+      .attr("stroke-width", 1.5)
+      .attr("stroke-dasharray", "5,5")
+      .append("title")
+      .text(d => `${d.year} Tariff: ${d.rate}%`);
+
+    // Add labels for each tariff year with rate
     svg.selectAll(".conflict-label")
-      .data(uniqueConflictYears)
+      .data(conflictData)
       .enter()
       .append("text")
       .attr("class", "conflict-label")
-      .attr("x", d => x(d))
+      .attr("x", d => x(d.year))
       .attr("y", height + 20)
       .attr("text-anchor", "middle")
-      .text("Tariff Imposed")
+      .text(d => `${d.year} (${d.rate}%)`)
       .style("font-size", "10px")
-      .style("fill", "#f39c12");
+      .style("fill", "#f39c12")
+      .style("font-weight", "bold");
   }
+
+  // Add grid lines for better readability
+  svg.append("g")
+    .attr("class", "grid")
+    .call(d3.axisLeft(y)
+      .tickSize(-width)
+      .tickFormat(""))
+    .selectAll("line")
+    .attr("stroke", "#eee")
+    .attr("stroke-dasharray", "2,2");
 }
 
 // ======================
