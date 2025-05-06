@@ -511,78 +511,48 @@ function renderCommodityTable(data) {
 // TREND CHART FUNCTIONS
 // ======================
 function initTrendFilters(data) {
-  // Get all unique countries from both exporter and importer
-  const countries = [...new Set([
-    ...data.trade.map(d => d.exporter),
-    ...data.trade.map(d => d.importer)
-  ])].filter(Boolean).sort();
-  
-  const products = [...new Set(data.trade.map(d => d.product))].sort();
-  
-  // Clear existing options
-  d3.select("#trend-country").html("");
-  d3.select("#trend-product").html("");
-  
-  // Populate country dropdown
-  d3.select("#trend-country")
-    .selectAll("option")
-    .data(countries)
-    .enter()
-    .append("option")
-    .text(d => d);
-  
-  // Populate product dropdown
-  d3.select("#trend-product")
-    .selectAll("option")
-    .data(products)
-    .enter()
-    .append("option")
-    .text(d => d);
-  
-  // Set initial values
-  if (countries.length > 0) {
-    d3.select("#trend-country").property("value", countries[0]);
-  }
-  if (products.length > 0) {
-    d3.select("#trend-product").property("value", products[0]);
-  }
-  
-  // Set up event listeners with proper binding
-  d3.select("#trend-country").on("change", function() {
-    updateTrendChart();
-  });
-  
-  d3.select("#trend-product").on("change", function() {
-    updateTrendChart();
-  });
-  
-  // Initial update
-  updateTrendChart();
+    // Get all unique products
+    const products = [...new Set(data.trade.map(d => d.product))].sort();
+    
+    // Clear and populate product dropdown
+    d3.select("#trend-product")
+      .selectAll("option")
+      .data(products)
+      .enter()
+      .append("option")
+      .text(d => d);
+    
+    // Set up event listener
+    d3.select("#trend-product").on("change", updateTrendChart);
 }
 
 function updateTrendChart() {
-  const country = d3.select("#trend-country").property("value");
-  const product = d3.select("#trend-product").property("value");
-  
-  if (!country || !product) {
-    d3.select("#trend-chart").html("<div class='trend-prompt'>Select a country and product to view trends</div>");
-    return;
-  }
-  
-  // Filter data where the selected country is either exporter or importer
-  // and matches the selected product
-  const filteredData = currentData.trade.filter(d => 
-    (d.exporter === country || d.importer === country) && 
-    d.product === product
-  ).sort((a, b) => a.year - b.year);
-  
-  // Determine if we're showing exports or imports
-  const isExport = filteredData.length > 0 && filteredData[0].exporter === country;
-  
-  renderTrendChart(filteredData, country, product, isExport);
+    const product = d3.select("#trend-product").property("value");
+    
+    if (!product) {
+      d3.select("#trend-chart").html("<div class='trend-prompt'>Select a product to view trends</div>");
+      return;
+    }
+    
+    // Filter data for selected product
+    const productData = currentData.trade
+      .filter(d => d.product === product)
+      .sort((a, b) => a.year - b.year);
+    
+    if (productData.length === 0) {
+      d3.select("#trend-chart").html(`<div class='trend-prompt'>No trade data for ${product}</div>`);
+      return;
+    }
+    
+    // Auto-determine trade direction (take first available)
+    const exporter = productData[0].exporter;
+    const importer = productData[0].importer;
+    const isExport = true; // Always show as export from source
+    
+    renderTrendChart(productData, exporter, importer, product, isExport);
 }
 
-function renderTrendChart(data, country, product) {
+function renderTrendChart(data, exporter, importer, product, isExport) {
     // Clear previous chart
     const container = d3.select("#trend-chart")
       .html("")
@@ -594,14 +564,9 @@ function renderTrendChart(data, country, product) {
       container.append("text")
         .attr("x", 100)
         .attr("y", 50)
-        .text(`No trade data for ${product} involving ${country}`);
+        .text(`No trade data for ${product}`);
       return;
     }
-
-    // Determine trade direction (export or import)
-    const isExport = data[0].exporter === country;
-    const partnerCountry = isExport ? data[0].importer : data[0].exporter;
-    const tradeDirection = isExport ? "Exports to" : "Imports from";
 
     // Set up chart dimensions
     const margin = { top: 50, right: 30, bottom: 50, left: 60 };
@@ -628,11 +593,11 @@ function renderTrendChart(data, country, product) {
       .y(d => y(d.value_usd_billion))
       .curve(d3.curveMonotoneX);
 
-    // Add line path with color based on trade direction
+    // Add line path (always green for exports)
     svg.append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", isExport ? "#2ecc71" : "#e74c3c")
+      .attr("stroke", "#2ecc71") // Green for exports
       .attr("stroke-width", 3)
       .attr("d", line);
 
@@ -645,9 +610,9 @@ function renderTrendChart(data, country, product) {
       .attr("cx", d => x(d.year))
       .attr("cy", d => y(d.value_usd_billion))
       .attr("r", 5)
-      .attr("fill", isExport ? "#2ecc71" : "#e74c3c")
+      .attr("fill", "#2ecc71")
       .append("title")
-      .text(d => `${d.year}: $${d.value_usd_billion}B ${isExport ? 'exported' : 'imported'}`);
+      .text(d => `${d.year}: $${d.value_usd_billion}B exported`);
 
     // Add axes
     svg.append("g")
@@ -668,23 +633,14 @@ function renderTrendChart(data, country, product) {
       .attr("text-anchor", "end")
       .text("Value (USD Billion)");
 
-    // Add dynamic title
+    // Add title showing fixed direction
     svg.append("text")
       .attr("x", width / 2)
       .attr("y", -20)
       .attr("text-anchor", "middle")
       .style("font-size", "16px")
       .style("font-weight", "bold")
-      .text(`${product} ${tradeDirection} ${partnerCountry}`);
-
-    // Add subtitle
-    svg.append("text")
-      .attr("x", width / 2)
-      .attr("y", -5)
-      .attr("text-anchor", "middle")
-      .style("font-size", "12px")
-      .style("fill", "#777")
-      .text(`From ${country}'s perspective`);
+      .text(`${product} Exports from ${exporter} to ${importer}`);
 
     // Add grid lines
     svg.append("g")
