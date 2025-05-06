@@ -130,11 +130,12 @@ async function loadCaseStudy(studyId) {
   const years = [...new Set(currentData.tariffs.map(d => d.year))].sort();
   initTimeline(years);
   initCommodityFilters(currentData);
-  initTrendFilters(currentData);
+  initTrendFilters(currentData); // Ensure this is called
   
   // Reset dropdowns to default values
   d3.select("#country-filter").property("value", "All Countries");
   d3.select("#year-filter").property("value", "All Years");
+  d3.select("#trend-product").property("value", ""); // Reset product selection
   
   // Initial render
   updateVisualizations(years[0]);
@@ -511,146 +512,160 @@ function renderCommodityTable(data) {
 // TREND CHART FUNCTIONS
 // ======================
 function initTrendFilters(data) {
-    // Get all unique products
-    const products = [...new Set(data.trade.map(d => d.product))].sort();
-    
-    // Clear and populate product dropdown
-    d3.select("#trend-product")
-      .selectAll("option")
-      .data(products)
-      .enter()
-      .append("option")
-      .text(d => d);
-    
-    // Set up event listener
-    d3.select("#trend-product").on("change", updateTrendChart);
+  // Get all unique products
+  const products = [...new Set(data.trade.map(d => d.product))].sort();
+  
+  // Select the dropdown and clear existing options
+  const productSelect = d3.select("#trend-product").html("");
+
+  // Add default option
+  productSelect
+    .append("option")
+    .attr("value", "")
+    .text("Select a product");
+
+  // Populate product dropdown
+  productSelect.selectAll("option.product")
+    .data(products)
+    .enter()
+    .append("option")
+    .attr("class", "product")
+    .attr("value", d => d)
+    .text(d => d);
+  
+  // Set up event listener
+  productSelect.on("change", updateTrendChart);
+  
+  // Reset the trend chart display
+  d3.select("#trend-chart").html("<div class='trend-prompt'>Select a product to view trends</div>");
 }
 
+
 function updateTrendChart() {
-    const product = d3.select("#trend-product").property("value");
-    
-    if (!product) {
-      d3.select("#trend-chart").html("<div class='trend-prompt'>Select a product to view trends</div>");
-      return;
-    }
-    
-    // Filter data for selected product
-    const productData = currentData.trade
-      .filter(d => d.product === product)
-      .sort((a, b) => a.year - b.year);
-    
-    if (productData.length === 0) {
-      d3.select("#trend-chart").html(`<div class='trend-prompt'>No trade data for ${product}</div>`);
-      return;
-    }
-    
-    // Auto-determine trade direction (take first available)
-    const exporter = productData[0].exporter;
-    const importer = productData[0].importer;
-    const isExport = true; // Always show as export from source
-    
-    renderTrendChart(productData, exporter, importer, product, isExport);
+  const product = d3.select("#trend-product").property("value");
+  
+  if (!product) {
+    d3.select("#trend-chart").html("<div class='trend-prompt'>Select a product to view trends</div>");
+    return;
+  }
+  
+  // Filter data for selected product
+  const productData = currentData.trade
+    .filter(d => d.product === product)
+    .sort((a, b) => a.year - b.year);
+  
+  if (productData.length === 0) {
+    d3.select("#trend-chart").html(`<div class='trend-prompt'>No trade data for ${product}</div>`);
+    return;
+  }
+  
+  // Auto-determine trade direction (take first available)
+  const exporter = productData[0].exporter;
+  const importer = productData[0].importer;
+  const isExport = true; // Always show as export from source
+  
+  renderTrendChart(productData, exporter, importer, product, isExport);
 }
 
 function renderTrendChart(data, exporter, importer, product, isExport) {
-    // Clear previous chart
-    const container = d3.select("#trend-chart")
-      .html("")
-      .append("svg")
-      .attr("width", "100%")
-      .attr("height", "400");
+  // Clear previous chart
+  const container = d3.select("#trend-chart")
+    .html("")
+    .append("svg")
+    .attr("width", "100%")
+    .attr("height", "400");
 
-    if (data.length === 0) {
-      container.append("text")
-        .attr("x", 100)
-        .attr("y", 50)
-        .text(`No trade data for ${product}`);
-      return;
-    }
+  if (data.length === 0) {
+    container.append("text")
+      .attr("x", 100)
+      .attr("y", 50)
+      .text(`No trade data for ${product}`);
+    return;
+  }
 
-    // Set up chart dimensions
-    const margin = { top: 50, right: 30, bottom: 50, left: 60 };
-    const width = 800 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+  // Set up chart dimensions
+  const margin = { top: 50, right: 30, bottom: 50, left: 60 };
+  const width = 800 - margin.left - margin.right;
+  const height = 400 - margin.top - margin.bottom;
 
-    const svg = container.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+  const svg = container.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Create scales
-    const x = d3.scaleLinear()
-      .domain(d3.extent(data, d => d.year))
-      .range([0, width])
-      .nice();
+  // Create scales
+  const x = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.year))
+    .range([0, width])
+    .nice();
 
-    const y = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.value_usd_billion) * 1.1])
-      .range([height, 0])
-      .nice();
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.value_usd_billion) * 1.1])
+    .range([height, 0])
+    .nice();
 
-    // Create line generator
-    const line = d3.line()
-      .x(d => x(d.year))
-      .y(d => y(d.value_usd_billion))
-      .curve(d3.curveMonotoneX);
+  // Create line generator
+  const line = d3.line()
+    .x(d => x(d.year))
+    .y(d => y(d.value_usd_billion))
+    .curve(d3.curveMonotoneX);
 
-    // Add line path (always green for exports)
-    svg.append("path")
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", "#2ecc71") // Green for exports
-      .attr("stroke-width", 3)
-      .attr("d", line);
+  // Add line path (always green for exports)
+  svg.append("path")
+    .datum(data)
+    .attr("fill", "none")
+    .attr("stroke", "#2ecc71") // Green for exports
+    .attr("stroke-width", 3)
+    .attr("d", line);
 
-    // Add circles for data points
-    svg.selectAll(".dot")
-      .data(data)
-      .enter()
-      .append("circle")
-      .attr("class", "dot")
-      .attr("cx", d => x(d.year))
-      .attr("cy", d => y(d.value_usd_billion))
-      .attr("r", 5)
-      .attr("fill", "#2ecc71")
-      .append("title")
-      .text(d => `${d.year}: $${d.value_usd_billion}B exported`);
+  // Add circles for data points
+  svg.selectAll(".dot")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("class", "dot")
+    .attr("cx", d => x(d.year))
+    .attr("cy", d => y(d.value_usd_billion))
+    .attr("r", 5)
+    .attr("fill", "#2ecc71")
+    .append("title")
+    .text(d => `${d.year}: $${d.value_usd_billion}B exported`);
 
-    // Add axes
-    svg.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x).tickFormat(d3.format("d")))
-      .append("text")
-      .attr("x", width)
-      .attr("y", -6)
-      .attr("text-anchor", "end")
-      .text("Year");
+  // Add axes
+  svg.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+    .append("text")
+    .attr("x", width)
+    .attr("y", -6)
+    .attr("text-anchor", "end")
+    .text("Year");
 
-    svg.append("g")
-      .call(d3.axisLeft(y))
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
-      .text("Value (USD Billion)");
+  svg.append("g")
+    .call(d3.axisLeft(y))
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", "0.71em")
+    .attr("text-anchor", "end")
+    .text("Value (USD Billion)");
 
-    // Add title showing fixed direction
-    svg.append("text")
-      .attr("x", width / 2)
-      .attr("y", -20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "16px")
-      .style("font-weight", "bold")
-      .text(`${product} Exports from ${exporter} to ${importer}`);
+  // Add title showing fixed direction
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", -20)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .style("font-weight", "bold")
+    .text(`${product} Exports from ${exporter} to ${importer}`);
 
-    // Add grid lines
-    svg.append("g")
-      .attr("class", "grid")
-      .call(d3.axisLeft(y)
-        .tickSize(-width)
-        .tickFormat(""))
-      .selectAll("line")
-      .attr("stroke", "#eee")
-      .attr("stroke-dasharray", "2,2");
+  // Add grid lines
+  svg.append("g")
+    .attr("class", "grid")
+    .call(d3.axisLeft(y)
+      .tickSize(-width)
+      .tickFormat(""))
+    .selectAll("line")
+    .attr("stroke", "#eee")
+    .attr("stroke-dasharray", "2,2");
 }
 
 // ======================
