@@ -625,11 +625,14 @@ function renderTrendChart(data, exporter, importer, product, isExport) {
   const svg = container.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+  // Get all years present in data
+  const years = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
+
   // Create scales
-  const x = d3.scaleLinear()
-    .domain(d3.extent(data, d => d.year))
+  const x = d3.scaleBand()
+    .domain(years)
     .range([0, width])
-    .nice();
+    .padding(0.1);
 
   const y = d3.scaleLinear()
     .domain([0, d3.max(data, d => d.value_usd_billion) * 1.1])
@@ -638,66 +641,58 @@ function renderTrendChart(data, exporter, importer, product, isExport) {
 
   // Create line generator
   const line = d3.line()
-    .x(d => x(d.year))
+    .x(d => x(d.year) + x.bandwidth() / 2) // Center in band
     .y(d => y(d.value_usd_billion))
     .curve(d3.curveMonotoneX);
 
-    const study = caseStudies[d3.select("#case-study").node().value];
+  const study = caseStudies[d3.select("#case-study").node().value];
   
-    // Determine color based on trade direction
-    const lineColor = isExport ? 
-      study.countryColors[exporter] || "#2ecc71" : 
-      study.countryColors[importer] || "#e74c3c";
-  
-    // Add line path (color based on direction)
-    svg.append("path")
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", lineColor)
-      .attr("stroke-width", 3)
-      .attr("d", line);
-  
-    // Add circles for data points (same color as line)
-    svg.selectAll(".dot")
-      .data(data)
-      .enter()
-      .append("circle")
-      .attr("class", "dot")
-      .attr("cx", d => x(d.year))
-      .attr("cy", d => y(d.value_usd_billion))
-      .attr("r", 5)
-      .attr("fill", lineColor)
-      .append("title")
-      .text(d => `${d.year}: $${d.value_usd_billion}B ${isExport ? 'exported' : 'imported'}`);
-  
+  // Determine color based on trade direction
+  const lineColor = isExport ? 
+    study.countryColors[exporter] || "#2ecc71" : 
+    study.countryColors[importer] || "#e74c3c";
 
-  // Add axes
+  // Add line path
+  svg.append("path")
+    .datum(data)
+    .attr("fill", "none")
+    .attr("stroke", lineColor)
+    .attr("stroke-width", 3)
+    .attr("d", line);
+
+  // Add circles for data points
+  svg.selectAll(".dot")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("class", "dot")
+    .attr("cx", d => x(d.year) + x.bandwidth() / 2)
+    .attr("cy", d => y(d.value_usd_billion))
+    .attr("r", 5)
+    .attr("fill", lineColor)
+    .append("title")
+    .text(d => `${d.year}: $${d.value_usd_billion}B ${isExport ? 'exported' : 'imported'}`);
+
+  // Add x-axis with one tick per year
   svg.append("g")
     .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x).tickFormat(d3.format("d")))
-    .append("text")
-    .attr("x", width)
-    .attr("y", -6)
-    .attr("text-anchor", "end")
-    .text("Year");
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("transform", "translate(0,10) rotate(-45)")
+    .style("text-anchor", "end");
 
+  // Add y-axis
   svg.append("g")
-    .call(d3.axisLeft(y))
-    .append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 6)
-    .attr("dy", "0.71em")
-    .attr("text-anchor", "end")
-    .text("Value (USD Billion)");
+    .call(d3.axisLeft(y));
 
-  // Add title showing fixed direction
+  // Add title
   svg.append("text")
     .attr("x", width / 2)
     .attr("y", -20)
     .attr("text-anchor", "middle")
     .style("font-size", "16px")
     .style("font-weight", "bold")
-    .text(`${product} Exports from ${exporter} to ${importer}`);
+    .text(`${product} Trade ${isExport ? 'Exports' : 'Imports'} (${exporter}→${importer})`);
 
   // Add grid lines
   svg.append("g")
