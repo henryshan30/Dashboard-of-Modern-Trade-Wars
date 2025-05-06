@@ -237,11 +237,19 @@ function updateTradeChart(data, year) {
   const svg = container.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+  // Group data by product and trade direction
+  const groupedData = d3.groups(data, d => d.product);
+  
   // Create scales
-  const x = d3.scaleBand()
-    .domain(data.map(d => d.product))
+  const x0 = d3.scaleBand()
+    .domain(groupedData.map(d => d[0]))
     .range([0, width])
     .padding(0.2);
+
+  const x1 = d3.scaleBand()
+    .domain(["export", "import"])
+    .range([0, x0.bandwidth()])
+    .padding(0.1);
 
   const y = d3.scaleLinear()
     .domain([0, d3.max(data, d => d.value_usd_billion) * 1.1])
@@ -250,25 +258,33 @@ function updateTradeChart(data, year) {
   // Get current case study for colors
   const study = caseStudies[d3.select("#case-study").node().value];
 
-  // Add bars
-  svg.selectAll(".bar")
-    .data(data)
+  // Add groups for each product
+  const productGroups = svg.selectAll(".product-group")
+    .data(groupedData)
+    .enter()
+    .append("g")
+    .attr("class", "product-group")
+    .attr("transform", d => `translate(${x0(d[0])},0)`);
+
+  // Add bars for each trade direction
+  productGroups.selectAll(".bar")
+    .data(d => d[1])
     .enter()
     .append("rect")
     .attr("class", "bar")
-    .attr("x", d => x(d.product))
+    .attr("x", d => x1(d.exporter === study.country ? "export" : "import"))
     .attr("y", d => y(d.value_usd_billion))
-    .attr("width", x.bandwidth())
+    .attr("width", x1.bandwidth())
     .attr("height", d => height - y(d.value_usd_billion))
     .attr("fill", d => study.countryColors[d.exporter] || "#777");
 
   // Add value labels
-  svg.selectAll(".label")
-    .data(data)
+  productGroups.selectAll(".label")
+    .data(d => d[1])
     .enter()
     .append("text")
     .attr("class", "label")
-    .attr("x", d => x(d.product) + x.bandwidth() / 2)
+    .attr("x", d => x1(d.exporter === study.country ? "export" : "import") + x1.bandwidth()/2)
     .attr("y", d => y(d.value_usd_billion) - 5)
     .attr("text-anchor", "middle")
     .text(d => `$${d.value_usd_billion}B`);
@@ -276,7 +292,7 @@ function updateTradeChart(data, year) {
   // Add axes
   svg.append("g")
     .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x))
+    .call(d3.axisBottom(x0))
     .selectAll("text")
     .attr("transform", "rotate(-45)")
     .style("text-anchor", "end");
@@ -608,26 +624,34 @@ function renderTrendChart(data, exporter, importer, product, isExport) {
     .y(d => y(d.value_usd_billion))
     .curve(d3.curveMonotoneX);
 
-  // Add line path (always green for exports)
-  svg.append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "#2ecc71") // Green for exports
-    .attr("stroke-width", 3)
-    .attr("d", line);
-
-  // Add circles for data points
-  svg.selectAll(".dot")
-    .data(data)
-    .enter()
-    .append("circle")
-    .attr("class", "dot")
-    .attr("cx", d => x(d.year))
-    .attr("cy", d => y(d.value_usd_billion))
-    .attr("r", 5)
-    .attr("fill", "#2ecc71")
-    .append("title")
-    .text(d => `${d.year}: $${d.value_usd_billion}B exported`);
+    const study = caseStudies[d3.select("#case-study").node().value];
+  
+    // Determine color based on trade direction
+    const lineColor = isExport ? 
+      study.countryColors[exporter] || "#2ecc71" : 
+      study.countryColors[importer] || "#e74c3c";
+  
+    // Add line path (color based on direction)
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", lineColor)
+      .attr("stroke-width", 3)
+      .attr("d", line);
+  
+    // Add circles for data points (same color as line)
+    svg.selectAll(".dot")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("class", "dot")
+      .attr("cx", d => x(d.year))
+      .attr("cy", d => y(d.value_usd_billion))
+      .attr("r", 5)
+      .attr("fill", lineColor)
+      .append("title")
+      .text(d => `${d.year}: $${d.value_usd_billion}B ${isExport ? 'exported' : 'imported'}`);
+  
 
   // Add axes
   svg.append("g")
