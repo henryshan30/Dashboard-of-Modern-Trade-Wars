@@ -181,36 +181,60 @@ function updateVisualizations(year) {
 }
 
 function updateMap(data) {
-  // Clear existing
+  // Clear existing circles
   currentMap.eachLayer(layer => {
     if (layer instanceof L.CircleMarker) currentMap.removeLayer(layer);
   });
 
-  // Get current case study
   const study = caseStudies[d3.select("#case-study").node().value];
-  
-  // Add new markers
-  data.forEach(d => {
-    const radius = config.defaultRadius + (d.tariff_rate / 5);
-    const color = study.countryColors[d.country] || "#777";
-    
-    L.circleMarker([d.lat || study.mapCenter[0], d.lng || study.mapCenter[1]], {
-      radius: radius,
-      fillColor: color,
-      fillOpacity: 0.7,
-      stroke: true,
-      weight: 1,
-      color: "#fff"
-    })
-    .bindPopup(`
-      <b>${d.product} Tariffs</b><br>
-      <table>
-        <tr><td>Country:</td><td>${d.country}</td></tr>
-        <tr><td>Year:</td><td>${d.year}</td></tr>
-        <tr><td>Rate:</td><td>${d.tariff_rate}%</td></tr>
-      </table>
-    `)
-    .addTo(currentMap);
+
+  // Group by BOTH country and product to show all tariffs
+  const groupedByCountryProduct = d3.group(data, 
+    d => d.country, 
+    d => d.product
+  );
+
+  // Create markers for each unique country-product combination
+  groupedByCountryProduct.forEach((products, country) => {
+    products.forEach((tariffs, product) => {
+      const countryColor = study.countryColors[country] || "#777";
+      
+      // Use average tariff for circle size
+      const avgTariff = d3.mean(tariffs, d => d.tariff_rate);
+      const radius = config.defaultRadius + (avgTariff / 5);
+      
+      // Get coordinates (use first entry's coordinates)
+      const { lat, lng } = tariffs[0];
+
+      // Build detailed popup content
+      const popupContent = `
+        <div class="tariff-popup">
+          <h3>${product} Tariffs</h3>
+          <small>${country}</small>
+          <table class="tariff-details">
+            ${tariffs.sort((a,b) => a.year - b.year)
+              .map(d => `
+                <tr>
+                  <td>${d.year}:</td>
+                  <td>${d3.format(".1f")(d.tariff_rate)}%</td>
+                </tr>
+              `).join('')}
+          </table>
+        </div>
+      `;
+
+      // Create the circle marker
+      L.circleMarker([lat, lng], {
+        radius: radius,
+        fillColor: countryColor,
+        fillOpacity: 0.7,
+        stroke: true,
+        weight: 1,
+        color: "#fff"
+      })
+      .bindPopup(popupContent)
+      .addTo(currentMap);
+    });
   });
 }
 
@@ -349,11 +373,42 @@ async function loadData(dataPath, study) {
       })
     ]);
     
-    // Add geo-coordinates if missing
+    // Fixed geographic coordinates for countries
+    const countryCoordinates = {
+      "US": [37.09, -95.71],  // Center of USA
+      "CN": [35.86, 104.20],  // Center of China
+      "EU": [54.53, 15.26],   // Center of Europe
+      "UK": [53.51, -1.13],   // Center of UK
+      "DE": [51.16, 10.45],   // Germany
+      "FR": [46.22, 2.21],    // France
+      "JP": [36.20, 138.25],  // Japan
+      "CA": [56.13, -106.34], // Canada
+      "MX": [23.63, -102.55], // Mexico
+      "IN": [20.59, 78.96]    // India
+    };
+    
+    // Product-specific offsets (lat, lng)
+    const productOffsets = {
+      "Steel": [1.5, 1.5],
+      "Automobiles": [-1.5, 1.5],
+      "Electronics": [1.5, -1.5],
+      "Agriculture": [-1.5, -1.5],
+      "Textiles": [0, 3],
+      "Chemicals": [0, -3]
+    };
+    
+    // Add consistent geo-coordinates
     tariffs.forEach(d => {
       if (!d.lat || !d.lng) {
-        d.lat = study.mapCenter[0] + (Math.random() - 0.5) * 10;
-        d.lng = study.mapCenter[1] + (Math.random() - 0.5) * 20;
+        // Get base country coordinates
+        const baseCoords = countryCoordinates[d.country] || study.mapCenter;
+        
+        // Apply product-specific offset if defined
+        const offset = productOffsets[d.product] || [0, 0];
+        
+        // Set final coordinates
+        d.lat = baseCoords[0] + offset[0];
+        d.lng = baseCoords[1] + offset[1];
       }
     });
     
