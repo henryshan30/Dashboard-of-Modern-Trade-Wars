@@ -46,12 +46,12 @@ year,country,product,tariff_rate
 2023,EU,Automobiles,10
 2023,EU,Steel,5
 2023,EU,Wine,5
-2023,EU,Chemicals,0
-2024,US,Steel,5
+2023,EU,Chemicals,5
+2024,US,Steel,0
 2024,US,Aircraft,0
 2024,US,LNG,0
 2024,US,Semiconductors,0
-2024,EU,Automobiles,5
+2024,EU,Automobiles,10
 2024,EU,Steel,0
 2024,EU,Wine,5
-2024,EU,Chemicals,0
+2024,EU,Chemicals,5
