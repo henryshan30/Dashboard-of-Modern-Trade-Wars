@@ -132,6 +132,10 @@ async function loadCaseStudy(studyId) {
   initCommodityFilters(currentData);
   initTrendFilters(currentData);
   
+  // Reset dropdowns to default values
+  d3.select("#country-filter").property("value", "All Countries");
+  d3.select("#year-filter").property("value", "All Years");
+  
   // Initial render
   updateVisualizations(years[0]);
   updateCommodityTable();
@@ -347,6 +351,7 @@ async function loadData(dataPath, study) {
 // COMMODITY TABLE FUNCTIONS
 // ======================
 function initCommodityFilters(data) {
+  // Get all unique countries from both exporter and importer
   const countries = [...new Set([
     ...data.trade.map(d => d.exporter),
     ...data.trade.map(d => d.importer)
@@ -354,20 +359,34 @@ function initCommodityFilters(data) {
   
   const years = [...new Set(data.trade.map(d => d.year))].sort((a, b) => b - a);
   
-  // Country filter
+  // Clear and repopulate country filter
   const countrySelect = d3.select("#country-filter")
     .selectAll("option")
-    .data(["All Countries", ...countries])
-    .enter()
+    .data(["All Countries", ...countries]);
+  
+  // Remove old options
+  countrySelect.exit().remove();
+  
+  // Add new options
+  countrySelect.enter()
     .append("option")
+    .merge(countrySelect)
+    .attr("value", d => d)
     .text(d => d);
   
-  // Year filter
+  // Clear and repopulate year filter
   const yearSelect = d3.select("#year-filter")
     .selectAll("option")
-    .data(["All Years", ...years])
-    .enter()
+    .data(["All Years", ...years]);
+  
+  // Remove old options
+  yearSelect.exit().remove();
+  
+  // Add new options
+  yearSelect.enter()
     .append("option")
+    .merge(yearSelect)
+    .attr("value", d => d === "All Years" ? d : +d)
     .text(d => d);
   
   // Set up debounced update
