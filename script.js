@@ -181,61 +181,55 @@ function updateVisualizations(year) {
 }
 
 function updateMap(data) {
-  // Clear existing circles
   currentMap.eachLayer(layer => {
     if (layer instanceof L.CircleMarker) currentMap.removeLayer(layer);
   });
 
   const study = caseStudies[d3.select("#case-study").node().value];
 
-  // Group by BOTH country and product to show all tariffs
-  const groupedByCountryProduct = d3.group(data, 
-    d => d.country, 
-    d => d.product
-  );
+  // Group by country and show all tariffs in popup
+  const grouped = d3.group(data, d => d.country);
+  
+  grouped.forEach((tariffs, country) => {
+    const countryColor = study.countryColors[country] || "#777";
+    const firstTariff = tariffs[0]; // All tariffs for country share same coordinates
+    
+    // Use highest tariff for circle size
+    const maxTariff = d3.max(tariffs, d => d.tariff_rate);
+    const radius = config.defaultRadius + (maxTariff / 3);
 
-  // Create markers for each unique country-product combination
-  groupedByCountryProduct.forEach((products, country) => {
-    products.forEach((tariffs, product) => {
-      const countryColor = study.countryColors[country] || "#777";
-      
-      // Use average tariff for circle size
-      const avgTariff = d3.mean(tariffs, d => d.tariff_rate);
-      const radius = config.defaultRadius + (avgTariff / 5);
-      
-      // Get coordinates (use first entry's coordinates)
-      const { lat, lng } = tariffs[0];
-
-      // Build detailed popup content
-      const popupContent = `
-        <div class="tariff-popup">
-          <h3>${product} Tariffs</h3>
-          <small>${country}</small>
-          <table class="tariff-details">
-            ${tariffs.sort((a,b) => a.year - b.year)
-              .map(d => `
-                <tr>
-                  <td>${d.year}:</td>
-                  <td>${d3.format(".1f")(d.tariff_rate)}%</td>
-                </tr>
-              `).join('')}
-          </table>
-        </div>
-      `;
-
-      // Create the circle marker
-      L.circleMarker([lat, lng], {
-        radius: radius,
-        fillColor: countryColor,
-        fillOpacity: 0.7,
-        stroke: true,
-        weight: 1,
-        color: "#fff"
-      })
-      .bindPopup(popupContent)
-      .addTo(currentMap);
-    });
+    L.circleMarker([firstTariff.lat, firstTariff.lng], {
+      radius: radius,
+      fillColor: countryColor,
+      fillOpacity: 0.8,
+      stroke: true,
+      weight: 1,
+      color: "#fff"
+    })
+    .bindPopup(createCountryPopup(tariffs, country, study))
+    .addTo(currentMap);
   });
+}
+
+function createCountryPopup(tariffs, country, study) {
+  const sortedTariffs = [...tariffs].sort((a, b) => b.tariff_rate - a.tariff_rate);
+  const countryColor = study.countryColors[country] || "#777";
+  
+  return `
+    <div class="tariff-popup">
+      <h3>${country} Tariffs (${tariffs[0].year})</h3>
+      <table class="tariff-details">
+        ${sortedTariffs.map(t => `
+          <tr>
+            <td>${t.product}</td>
+            <td style="color:${t.tariff_rate > 0 ? countryColor : '#95a5a6'}">
+              ${t.tariff_rate > 0 ? t.tariff_rate + '%' : 'None'}
+            </td>
+          </tr>
+        `).join('')}
+      </table>
+    </div>
+  `;
 }
 
 function updateTradeChart(data, year) {
@@ -359,59 +353,28 @@ function updateMacroTable(data) {
 async function loadData(dataPath, study) {
   try {
     const [tariffs, trade, macro] = await Promise.all([
-      d3.csv(`${dataPath}tariffs.csv`, d3.autoType).catch(err => {
-        console.error("Error loading tariffs:", err);
-        return [];
-      }),
-      d3.csv(`${dataPath}trade_volumes.csv`, d3.autoType).catch(err => {
-        console.error("Error loading trade volumes:", err);
-        return [];
-      }),
-      d3.csv(`${dataPath}macro.csv`, d3.autoType).catch(err => {
-        console.error("Error loading macro data:", err);
-        return [];
-      })
+      d3.csv(`${dataPath}tariffs.csv`, d3.autoType),
+      d3.csv(`${dataPath}trade_volumes.csv`, d3.autoType),
+      d3.csv(`${dataPath}macro.csv`, d3.autoType)
     ]);
-    
-    // Fixed geographic coordinates for countries
+
+    // Fixed country coordinates (same for all case studies)
     const countryCoordinates = {
-      "US": [37.09, -95.71],  // Center of USA
-      "CN": [35.86, 104.20],  // Center of China
-      "EU": [54.53, 15.26],   // Center of Europe
-      "UK": [53.51, -1.13],   // Center of UK
-      "DE": [51.16, 10.45],   // Germany
-      "FR": [46.22, 2.21],    // France
-      "JP": [36.20, 138.25],  // Japan
-      "CA": [56.13, -106.34], // Canada
-      "MX": [23.63, -102.55], // Mexico
-      "IN": [20.59, 78.96]    // India
+      "US": [39.8283, -98.5795],  // Center of USA
+      "CN": [35.8617, 104.1954],   // Center of China
+      "EU": [54.5260, 15.2551],    // Center of Europe
+      "UK": [55.3781, -3.4360],    // Center of UK
+      // Add other countries as needed
     };
-    
-    // Product-specific offsets (lat, lng)
-    const productOffsets = {
-      "Steel": [1.5, 1.5],
-      "Automobiles": [-1.5, 1.5],
-      "Electronics": [1.5, -1.5],
-      "Agriculture": [-1.5, -1.5],
-      "Textiles": [0, 3],
-      "Chemicals": [0, -3]
-    };
-    
-    // Add consistent geo-coordinates
+
+    // Apply fixed coordinates to tariffs
     tariffs.forEach(d => {
-      if (!d.lat || !d.lng) {
-        // Get base country coordinates
-        const baseCoords = countryCoordinates[d.country] || study.mapCenter;
-        
-        // Apply product-specific offset if defined
-        const offset = productOffsets[d.product] || [0, 0];
-        
-        // Set final coordinates
-        d.lat = baseCoords[0] + offset[0];
-        d.lng = baseCoords[1] + offset[1];
+      if (countryCoordinates[d.country]) {
+        d.lat = countryCoordinates[d.country][0];
+        d.lng = countryCoordinates[d.country][1];
       }
     });
-    
+
     return { tariffs, trade, macro };
   } catch (error) {
     console.error("Error loading data:", error);
