@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Global Trade Wars Dashboard</title>
   <meta charset="UTF-8">
@@ -15,6 +16,7 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body>
   <div id="dashboard">
     <header>
@@ -40,19 +42,19 @@
         <h2><span class="icon">🌍</span> Tariff Heatmap</h2>
         <div id="map"></div>
       </div>
-      
+
       <!-- Timeline -->
       <div class="card" id="timeline-card">
         <h2><span class="icon">📅</span> Timeline Control</h2>
         <div id="timeline"></div>
       </div>
-      
+
       <!-- Trade Chart -->
       <div class="card" id="trade-card">
         <h2><span class="icon">📊</span> Trade Volumes</h2>
         <div id="trade-chart"></div>
       </div>
-      
+
       <!-- Macro Table -->
       <div class="card" id="macro-card">
         <h2><span class="icon">💹</span> Macroeconomic Indicators</h2>
@@ -80,18 +82,17 @@
       <!-- Trade Volume Trends -->
       <div class="card" id="trends-card">
         <h2><span class="icon">📈</span> Trade Volume Trends</h2>
+        <!-- Replace the existing controls div with this -->
         <div class="controls">
-          <label for="trend-country">Country:</label>
-          <select id="trend-country"></select>
           <label for="trend-product">Product:</label>
           <select id="trend-product"></select>
         </div>
         <div id="trend-chart">
-          <div class="trend-prompt">Select a country and product to view trends</div>
+          <div class="trend-prompt">Select a product to view trends</div>
         </div>
       </div>
     </div>
-    
+
     <footer>
       <p>Data sources: USITC, World Bank WITS, IMF, Eurostat | Updated: May 2025</p>
     </footer>
@@ -108,4 +109,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>
