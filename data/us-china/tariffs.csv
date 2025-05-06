@@ -13,7 +13,7 @@ year,country,product,tariff_rate
 2019,US,Oil,10
 2019,US,Semiconductors,5
 2019,US,Medical Supplies,0
-2019,CN,Electronics,30
+2019,CN,Electronics,25
 2019,CN,Chemicals,25
 2019,CN,Textiles,35
 2019,CN,Pharmaceuticals,5
@@ -31,7 +31,7 @@ year,country,product,tariff_rate
 2021,US,Oil,10
 2021,US,Semiconductors,25
 2021,US,Medical Supplies,5
-2021,CN,Electronics,30
+2021,CN,Electronics,25
 2021,CN,Chemicals,25
 2021,CN,Textiles,25
 2021,CN,Rare Earth Metals,20
@@ -40,7 +40,7 @@ year,country,product,tariff_rate
 2022,US,Oil,5
 2022,US,Semiconductors,30
 2022,US,Medical Supplies,0
-2022,CN,Electronics,35
+2022,CN,Electronics,25
 2022,CN,Chemicals,30
 2022,CN,Textiles,20
 2022,CN,Consumer Electronics,25
@@ -49,7 +49,7 @@ year,country,product,tariff_rate
 2023,US,Oil,0
 2023,US,Semiconductors,25
 2023,US,Agricultural Products,15
-2023,CN,Electronics,40
+2023,CN,Electronics,25
 2023,CN,Chemicals,35
 2023,CN,Textiles,15
 2023,CN,Electric Vehicles,30
@@ -58,7 +58,7 @@ year,country,product,tariff_rate
 2024,US,Oil,0
 2024,US,Semiconductors,20
 2024,US,Agricultural Products,20
-2024,CN,Electronics,45
+2024,CN,Electronics,25
 2024,CN,Chemicals,40
 2024,CN,Textiles,10
 2024,CN,Solar Panels,35
