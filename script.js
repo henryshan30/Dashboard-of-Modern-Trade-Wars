@@ -583,158 +583,164 @@ function updateTrendChart() {
 }
 
 function renderTrendChart(data, country, product) {
-  // Clear previous chart
-  const container = d3.select("#trend-chart")
-    .html("")
-    .append("svg")
-    .attr("width", "100%")
-    .attr("height", "400");
+    // Clear previous chart
+    const container = d3.select("#trend-chart")
+      .html("")
+      .append("svg")
+      .attr("width", "100%")
+      .attr("height", "400");
 
-  if (data.length === 0) {
-    container.append("text")
-      .attr("x", 100)
-      .attr("y", 50)
-      .text(`No trade data for ${product} involving ${country}`);
-    return;
-  }
+    if (data.length === 0) {
+      container.append("text")
+        .attr("x", 100)
+        .attr("y", 50)
+        .text(`No trade data for ${product} involving ${country}`);
+      return;
+    }
 
-  // Determine trade direction (export or import)
-  const isExport = data[0].exporter === country;
-  const partnerCountry = isExport ? data[0].importer : data[0].exporter;
-  const tradeDirection = isExport ? "Exports to" : "Imports from";
+    // Determine trade direction (export or import)
+    const isExport = data[0].exporter === country;
+    const partnerCountry = isExport ? data[0].importer : data[0].exporter;
+    const tradeDirection = isExport ? "Exports to" : "Imports from";
 
-  // Set up chart dimensions
-  const margin = { top: 50, right: 30, bottom: 50, left: 60 };
-  const width = 800 - margin.left - margin.right;
-  const height = 400 - margin.top - margin.bottom;
+    // Set up chart dimensions
+    const margin = { top: 50, right: 30, bottom: 50, left: 60 };
+    const width = 800 - margin.left - margin.right;
+    const height = 400 - margin.top - margin.bottom;
 
-  const svg = container.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    const svg = container.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // Create scales
-  const x = d3.scaleLinear()
-    .domain(d3.extent(data, d => d.year))
-    .range([0, width])
-    .nice();
+    // Create scales
+    const x = d3.scaleLinear()
+      .domain(d3.extent(data, d => d.year))
+      .range([0, width])
+      .nice();
 
-  const y = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.value_usd_billion) * 1.1])
-    .range([height, 0])
-    .nice();
+    const y = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.value_usd_billion) * 1.1])
+      .range([height, 0])
+      .nice();
 
-  // Create line generator
-  const line = d3.line()
-    .x(d => x(d.year))
-    .y(d => y(d.value_usd_billion))
-    .curve(d3.curveMonotoneX);
+    // Create line generator
+    const line = d3.line()
+      .x(d => x(d.year))
+      .y(d => y(d.value_usd_billion))
+      .curve(d3.curveMonotoneX);
 
-  // Add line path with color based on trade direction
-  svg.append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", isExport ? "#2ecc71" : "#e74c3c") // Green for exports, red for imports
-    .attr("stroke-width", 3)
-    .attr("d", line);
+    // Add line path with color based on trade direction
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", isExport ? "#2ecc71" : "#e74c3c")
+      .attr("stroke-width", 3)
+      .attr("d", line);
 
-  // Add circles for data points
-  svg.selectAll(".dot")
-    .data(data)
-    .enter()
-    .append("circle")
-    .attr("class", "dot")
-    .attr("cx", d => x(d.year))
-    .attr("cy", d => y(d.value_usd_billion))
-    .attr("r", 5)
-    .attr("fill", isExport ? "#2ecc71" : "#e74c3c")
-    .append("title")
-    .text(d => `${d.year}: $${d.value_usd_billion}B ${isExport ? 'exported' : 'imported'}`);
-
-  // Add axes
-  svg.append("g")
-    .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x).tickFormat(d3.format("d")))
-    .append("text")
-    .attr("x", width)
-    .attr("y", -6)
-    .attr("text-anchor", "end")
-    .text("Year");
-
-  svg.append("g")
-    .call(d3.axisLeft(y))
-    .append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 6)
-    .attr("dy", "0.71em")
-    .attr("text-anchor", "end")
-    .text("Value (USD Billion)");
-
-  // Add dynamic title showing trade relationship
-  svg.append("text")
-    .attr("x", width / 2)
-    .attr("y", -20)
-    .attr("text-anchor", "middle")
-    .style("font-size", "16px")
-    .style("font-weight", "bold")
-    .text(`${product} ${tradeDirection} ${partnerCountry}`);
-
-  // Add subtitle with perspective country
-  svg.append("text")
-    .attr("x", width / 2)
-    .attr("y", -5)
-    .attr("text-anchor", "middle")
-    .style("font-size", "12px")
-    .style("fill", "#777")
-    .text(`From ${country}'s perspective`);
-
-  // Add tariff markers if available - UPDATED FOR MULTIPLE YEARS
-  const conflictData = currentData.tariffs
-    .filter(d => d.country === country && d.product === product && d.tariff_rate > 0)
-    .map(d => ({
-      year: d.year,
-      rate: d.tariff_rate
-    }));
-
-  if (conflictData.length > 0) {
-    // Add vertical lines for each tariff year
-    svg.selectAll(".conflict-marker")
-      .data(conflictData)
+    // Add circles for data points
+    svg.selectAll(".dot")
+      .data(data)
       .enter()
-      .append("line")
-      .attr("class", "conflict-marker")
-      .attr("x1", d => x(d.year))
-      .attr("x2", d => x(d.year))
-      .attr("y1", 0)
-      .attr("y2", height)
-      .attr("stroke", "#f39c12")
-      .attr("stroke-width", 1.5)
-      .attr("stroke-dasharray", "5,5")
+      .append("circle")
+      .attr("class", "dot")
+      .attr("cx", d => x(d.year))
+      .attr("cy", d => y(d.value_usd_billion))
+      .attr("r", 5)
+      .attr("fill", isExport ? "#2ecc71" : "#e74c3c")
       .append("title")
-      .text(d => `${d.year} Tariff: ${d.rate}%`);
+      .text(d => `${d.year}: $${d.value_usd_billion}B ${isExport ? 'exported' : 'imported'}`);
 
-    // Add labels for each tariff year with rate
-    svg.selectAll(".conflict-label")
-      .data(conflictData)
-      .enter()
+    // Add axes
+    svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x).tickFormat(d3.format("d")))
       .append("text")
-      .attr("class", "conflict-label")
-      .attr("x", d => x(d.year))
-      .attr("y", height + 20)
-      .attr("text-anchor", "middle")
-      .text(d => `${d.year} (${d.rate}%)`)
-      .style("font-size", "10px")
-      .style("fill", "#f39c12")
-      .style("font-weight", "bold");
-  }
+      .attr("x", width)
+      .attr("y", -6)
+      .attr("text-anchor", "end")
+      .text("Year");
 
-  // Add grid lines for better readability
-  svg.append("g")
-    .attr("class", "grid")
-    .call(d3.axisLeft(y)
-      .tickSize(-width)
-      .tickFormat(""))
-    .selectAll("line")
-    .attr("stroke", "#eee")
-    .attr("stroke-dasharray", "2,2");
+    svg.append("g")
+      .call(d3.axisLeft(y))
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Value (USD Billion)");
+
+    // Add dynamic title
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", -20)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
+      .text(`${product} ${tradeDirection} ${partnerCountry}`);
+
+    // Add subtitle
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", -5)
+      .attr("text-anchor", "middle")
+      .style("font-size", "12px")
+      .style("fill", "#777")
+      .text(`From ${country}'s perspective`);
+
+    // IMPROVED TARIFF MARKERS - FIXED PRODUCT MATCHING
+    const conflictData = currentData.tariffs.filter(d => {
+      // Match based on whether this is an import or export relationship
+      if (isExport) {
+        return d.country === partnerCountry && 
+               d.product === product && 
+               d.tariff_rate > 0;
+      } else {
+        return d.country === country && 
+               d.product === product && 
+               d.tariff_rate > 0;
+      }
+    });
+
+    if (conflictData.length > 0) {
+      // Add vertical lines for each tariff year
+      svg.selectAll(".conflict-marker")
+        .data(conflictData)
+        .enter()
+        .append("line")
+        .attr("class", "conflict-marker")
+        .attr("x1", d => x(d.year))
+        .attr("x2", d => x(d.year))
+        .attr("y1", 0)
+        .attr("y2", height)
+        .attr("stroke", "#f39c12")
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", "5,5")
+        .append("title")
+        .text(d => `${d.country} ${d.year} Tariff: ${d.tariff_rate}%`);
+
+      // Add labels for each tariff year
+      svg.selectAll(".conflict-label")
+        .data(conflictData)
+        .enter()
+        .append("text")
+        .attr("class", "conflict-label")
+        .attr("x", d => x(d.year))
+        .attr("y", height + 20)
+        .attr("text-anchor", "middle")
+        .text(d => `${d.year} (${d.tariff_rate}%)`)
+        .style("font-size", "10px")
+        .style("fill", "#f39c12")
+        .style("font-weight", "bold");
+    }
+
+    // Add grid lines
+    svg.append("g")
+      .attr("class", "grid")
+      .call(d3.axisLeft(y)
+        .tickSize(-width)
+        .tickFormat(""))
+      .selectAll("line")
+      .attr("stroke", "#eee")
+      .attr("stroke-dasharray", "2,2");
 }
 
 // ======================
