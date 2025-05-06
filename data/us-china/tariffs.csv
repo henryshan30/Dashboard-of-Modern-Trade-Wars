@@ -1,26 +1,64 @@
-year,country,product,tariff_rate,lat,lng
-2018,US,Soybeans,25,37.09,-95.71
-2018,US,Aircraft,10,37.09,-95.71
-2018,US,Oil,0,37.09,-95.71
-2018,US,Semiconductors,0,37.09,-95.71
-2018,US,Medical Supplies,0,37.09,-95.71
-2018,CN,Electronics,25,35.86,104.20
-2018,CN,Chemicals,15,35.86,104.20
-2018,CN,Textiles,30,35.86,104.20
-2018,CN,Pharmaceuticals,0,35.86,104.20
-2019,US,Soybeans,30,37.09,-95.71
-2019,US,Aircraft,15,37.09,-95.71
-2019,US,Oil,10,37.09,-95.71
-2019,CN,Electronics,30,35.86,104.20
-2019,CN,Chemicals,25,35.86,104.20
-2019,CN,Textiles,35,35.86,104.20
-2020,US,Medical Supplies,0,37.09,-95.71
-2020,CN,Pharmaceuticals,10,35.86,104.20
-2021,US,Semiconductors,25,37.09,-95.71
-2021,CN,Rare Earth Metals,20,35.86,104.20
-2022,US,Semiconductors,30,37.09,-95.71
-2022,CN,Consumer Electronics,25,35.86,104.20
-2023,US,Agricultural Products,15,37.09,-95.71
-2023,CN,Electric Vehicles,30,35.86,104.20
-2024,US,Agricultural Products,20,37.09,-95.71
-2024,CN,Solar Panels,35,35.86,104.20
+year,country,product,tariff_rate
+2018,US,Soybeans,25
+2018,US,Aircraft,10
+2018,US,Oil,0
+2018,US,Semiconductors,0
+2018,US,Medical Supplies,0
+2018,CN,Electronics,25
+2018,CN,Chemicals,15
+2018,CN,Textiles,30
+2018,CN,Pharmaceuticals,0
+2019,US,Soybeans,30
+2019,US,Aircraft,15
+2019,US,Oil,10
+2019,US,Semiconductors,5
+2019,US,Medical Supplies,0
+2019,CN,Electronics,30
+2019,CN,Chemicals,25
+2019,CN,Textiles,35
+2019,CN,Pharmaceuticals,5
+2020,US,Soybeans,25
+2020,US,Aircraft,20
+2020,US,Oil,15
+2020,US,Semiconductors,10
+2020,US,Medical Supplies,0
+2020,CN,Electronics,25
+2020,CN,Chemicals,20
+2020,CN,Textiles,30
+2020,CN,Pharmaceuticals,10
+2021,US,Soybeans,20
+2021,US,Aircraft,15
+2021,US,Oil,10
+2021,US,Semiconductors,25
+2021,US,Medical Supplies,5
+2021,CN,Electronics,30
+2021,CN,Chemicals,25
+2021,CN,Textiles,25
+2021,CN,Rare Earth Metals,20
+2022,US,Soybeans,15
+2022,US,Aircraft,10
+2022,US,Oil,5
+2022,US,Semiconductors,30
+2022,US,Medical Supplies,0
+2022,CN,Electronics,35
+2022,CN,Chemicals,30
+2022,CN,Textiles,20
+2022,CN,Consumer Electronics,25
+2023,US,Soybeans,10
+2023,US,Aircraft,5
+2023,US,Oil,0
+2023,US,Semiconductors,25
+2023,US,Agricultural Products,15
+2023,CN,Electronics,40
+2023,CN,Chemicals,35
+2023,CN,Textiles,15
+2023,CN,Electric Vehicles,30
+2024,US,Soybeans,5
+2024,US,Aircraft,0
+2024,US,Oil,0
+2024,US,Semiconductors,20
+2024,US,Agricultural Products,20
+2024,CN,Electronics,45
+2024,CN,Chemicals,40
+2024,CN,Textiles,10
+2024,CN,Solar Panels,35
