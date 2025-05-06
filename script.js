@@ -237,12 +237,37 @@ function updateTradeChart(data, year) {
   const svg = container.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // Group data by product and trade direction
-  const groupedData = d3.groups(data, d => d.product);
-  
-  // Create scales
+  // Get current case study
+  const study = caseStudies[d3.select("#case-study").node().value];
+  const otherCountry = Object.keys(study.countryColors).find(c => c !== study.country);
+
+  // Step 1: Aggregate by product and direction, but keep exporter
+  const aggregated = d3.rollup(
+    data,
+    v => ({
+      value: d3.sum(v, d => d.value_usd_billion),
+      exporter: v[0].exporter // assume all exports in v are from same country
+    }),
+    d => d.product,
+    d => d.exporter === study.country ? "export" : "import"
+  );
+
+  // Convert to flat array
+  const flatData = [];
+  for (const [product, dirMap] of aggregated.entries()) {
+    for (const [direction, { value, exporter }] of dirMap.entries()) {
+      flatData.push({
+        product,
+        direction,
+        value_usd_billion: value,
+        exporter
+      });
+    }
+  }
+
+  // Step 2: Build scales
   const x0 = d3.scaleBand()
-    .domain(groupedData.map(d => d[0]))
+    .domain([...new Set(flatData.map(d => d.product))])
     .range([0, width])
     .padding(0.2);
 
@@ -252,13 +277,12 @@ function updateTradeChart(data, year) {
     .padding(0.1);
 
   const y = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.value_usd_billion) * 1.1])
+    .domain([0, d3.max(flatData, d => d.value_usd_billion) * 1.1])
     .range([height, 0]);
 
-  // Get current case study for colors
-  const study = caseStudies[d3.select("#case-study").node().value];
+  // Step 3: Group data by product
+  const groupedData = d3.groups(flatData, d => d.product);
 
-  // Add groups for each product
   const productGroups = svg.selectAll(".product-group")
     .data(groupedData)
     .enter()
@@ -266,30 +290,30 @@ function updateTradeChart(data, year) {
     .attr("class", "product-group")
     .attr("transform", d => `translate(${x0(d[0])},0)`);
 
-  // Add bars for each trade direction
+  // Add bars
   productGroups.selectAll(".bar")
     .data(d => d[1])
     .enter()
     .append("rect")
     .attr("class", "bar")
-    .attr("x", d => x1(d.exporter === study.country ? "export" : "import"))
+    .attr("x", d => x1(d.direction))
     .attr("y", d => y(d.value_usd_billion))
     .attr("width", x1.bandwidth())
     .attr("height", d => height - y(d.value_usd_billion))
     .attr("fill", d => study.countryColors[d.exporter] || "#777");
 
-  // Add value labels
+  // Add labels
   productGroups.selectAll(".label")
     .data(d => d[1])
     .enter()
     .append("text")
     .attr("class", "label")
-    .attr("x", d => x1(d.exporter === study.country ? "export" : "import") + x1.bandwidth()/2)
+    .attr("x", d => x1(d.direction) + x1.bandwidth() / 2)
     .attr("y", d => y(d.value_usd_billion) - 5)
     .attr("text-anchor", "middle")
     .text(d => `$${d.value_usd_billion}B`);
 
-  // Add axes
+  // Axes
   svg.append("g")
     .attr("transform", `translate(0,${height})`)
     .call(d3.axisBottom(x0))
@@ -300,6 +324,7 @@ function updateTradeChart(data, year) {
   svg.append("g")
     .call(d3.axisLeft(y));
 }
+
 
 function updateMacroTable(data) {
   const table = d3.select("#macro-table")
