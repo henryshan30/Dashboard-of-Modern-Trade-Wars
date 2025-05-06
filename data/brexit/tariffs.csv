@@ -73,6 +73,6 @@ year,country,product,tariff_rate
 2024,EU,Automobiles,10
 2024,EU,Chemicals,5
 2024,EU,Food,8
-2024,EU,Machinery,1.7
-2024,EU,Textiles,8
-2024,EU,Electronics,0
+2024,EU,Machinery,4
+2024,EU,Textiles,10
+2024,EU,Electronics,14
