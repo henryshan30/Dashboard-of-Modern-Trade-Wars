@@ -686,52 +686,6 @@ function renderTrendChart(data, country, product) {
       .style("fill", "#777")
       .text(`From ${country}'s perspective`);
 
-    // IMPROVED TARIFF MARKERS - FIXED PRODUCT MATCHING
-    const conflictData = currentData.tariffs.filter(d => {
-      // Match based on whether this is an import or export relationship
-      if (isExport) {
-        return d.country === partnerCountry && 
-               d.product === product && 
-               d.tariff_rate > 0;
-      } else {
-        return d.country === country && 
-               d.product === product && 
-               d.tariff_rate > 0;
-      }
-    });
-
-    if (conflictData.length > 0) {
-      // Add vertical lines for each tariff year
-      svg.selectAll(".conflict-marker")
-        .data(conflictData)
-        .enter()
-        .append("line")
-        .attr("class", "conflict-marker")
-        .attr("x1", d => x(d.year))
-        .attr("x2", d => x(d.year))
-        .attr("y1", 0)
-        .attr("y2", height)
-        .attr("stroke", "#f39c12")
-        .attr("stroke-width", 2)
-        .attr("stroke-dasharray", "5,5")
-        .append("title")
-        .text(d => `${d.country} ${d.year} Tariff: ${d.tariff_rate}%`);
-
-      // Add labels for each tariff year
-      svg.selectAll(".conflict-label")
-        .data(conflictData)
-        .enter()
-        .append("text")
-        .attr("class", "conflict-label")
-        .attr("x", d => x(d.year))
-        .attr("y", height + 20)
-        .attr("text-anchor", "middle")
-        .text(d => `${d.year} (${d.tariff_rate}%)`)
-        .style("font-size", "10px")
-        .style("fill", "#f39c12")
-        .style("font-weight", "bold");
-    }
-
     // Add grid lines
     svg.append("g")
       .attr("class", "grid")
