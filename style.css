@@ -311,36 +311,22 @@ tr:hover {
     transition: none;
   }
 }
-/* ======================
-   TARIFF MAP MARKER STYLES
-   ====================== */
-/* Popup container */
-.leaflet-popup-content {
-  font-family: inherit; /* Use your dashboard font */
+/* Add to your existing CSS */
+.tariff-popup {
+  font-family: inherit;
   min-width: 200px;
   max-width: 300px;
-  margin: 12px;
-  color: var(--dark);
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-/* Popup header */
-.leaflet-popup-content h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.1em;
+.tariff-popup h3 {
+  margin: 0 0 10px 0;
   color: var(--primary);
   border-bottom: 1px solid var(--light);
-  padding-bottom: 6px;
+  padding-bottom: 5px;
 }
 
-/* Country subtitle */
-.leaflet-popup-content small {
-  display: block;
-  margin-bottom: 10px;
-  color: var(--secondary);
-  font-size: 0.85em;
-}
-
-/* Tariff table styles */
 .tariff-details {
   width: 100%;
   border-collapse: collapse;
@@ -351,92 +337,16 @@ tr:hover {
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.tariff-details tr:last-child {
-  border-bottom: none;
-}
-
 .tariff-details td {
   padding: 6px 0;
-  vertical-align: middle;
 }
 
 .tariff-details td:first-child {
-  font-weight: 600;
-  color: var(--primary);
-  padding-right: 15px;
+  font-weight: 500;
 }
 
 .tariff-details td:last-child {
   text-align: right;
   font-family: 'Courier New', monospace;
-  color: var(--accent);
   font-weight: bold;
-}
-
-/* Popup close button */
-.leaflet-popup-close-button {
-  color: #999 !important;
-  font-size: 20px !important;
-  transition: color 0.2s;
-}
-
-.leaflet-popup-close-button:hover {
-  color: var(--accent) !important;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .leaflet-popup-content {
-    min-width: 160px;
-    font-size: 0.9em;
-  }
-  
-  .tariff-details td {
-    padding: 4px 0;
-  }
-  .tariff-popup {
-    font-family: inherit;
-    max-width: 250px;
-  }
-  
-  .tariff-popup h3 {
-    margin: 0 0 5px 0;
-    color: var(--primary);
-    font-size: 1.1em;
-    border-bottom: 1px solid var(--light);
-    padding-bottom: 5px;
-  }
-  
-  .tariff-popup small {
-    display: block;
-    margin-bottom: 10px;
-    color: var(--secondary);
-    font-size: 0.85em;
-  }
-  
-  .tariff-details {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9em;
-  }
-  
-  .tariff-details tr {
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-  }
-  
-  .tariff-details td {
-    padding: 4px 0;
-  }
-  
-  .tariff-details td:first-child {
-    font-weight: 600;
-    padding-right: 10px;
-    color: var(--dark);
-  }
-  
-  .tariff-details td:last-child {
-    text-align: right;
-    font-family: 'Courier New', monospace;
-    color: var(--accent);
-}
 }
